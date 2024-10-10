@@ -1,6 +1,7 @@
-
 from django.contrib import admin
 from .models import Project, ProjectCriterion, Section, Category, Criterion
+from django import forms
+from django.core.exceptions import ValidationError
 
 
 class CategoryInline(admin.TabularInline):
@@ -25,13 +26,30 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 class CriterionAdmin(admin.ModelAdmin):
-    list_display = ['name', 'category', 'credits']
+    list_display = ['prefix', 'name', 'category']
     list_filter = ['category']
+
+
+class ProjectCriterionInlineFormSet(forms.BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        seen_criteria = set()
+        for form in self.forms:
+            if form.cleaned_data and not form.cleaned_data.get(
+                'DELETE', False
+                    ):
+                criterion = form.cleaned_data.get('criterion')
+                if criterion in seen_criteria:
+                    raise ValidationError(
+                        f"Doppeltes Kriterium: {criterion.name}"
+                        )
+                seen_criteria.add(criterion)
 
 
 class ProjectCriterionInline(admin.TabularInline):
     model = ProjectCriterion
-    extra = 0
+    formset = ProjectCriterionInlineFormSet
+    extra = 1
     readonly_fields = ['credits']
     fields = ['criterion', 'credits', 'status', 'note']
 

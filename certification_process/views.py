@@ -57,7 +57,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
         project = self.get_object()
 
         if request.method == "GET":
-            # Abrufen des spezifischen ProjectCriterion-Objekts
             project_criterion = ProjectCriterion.objects.filter(
                 project=project, criterion_id=criterion_id
             ).first()
@@ -74,23 +73,34 @@ class ProjectViewSet(viewsets.ModelViewSet):
         elif request.method == "POST":
             serializer = ProjectCriterionSerializer(data=request.data)
             if serializer.is_valid():
-                project_criterion,
-                created = ProjectCriterion.objects.update_or_create(
+                (project_criterion,
+                 created) = ProjectCriterion.objects.update_or_create(
                     project=project,
                     criterion_id=criterion_id,
                     defaults={
-                        "status": serializer.validated_data.get("status", "in_scope"),
+                        "status": serializer.validated_data.get(
+                            "status", "in_scope"
+                            ),
                         "note": serializer.validated_data.get("note", ""),
                     },
                 )
-                response_serializer = ProjectCriterionSerializer(project_criterion)
+                response_serializer = ProjectCriterionSerializer(
+                    project_criterion
+                    )
                 if created:
                     return Response(
-                        response_serializer.data, status=status.HTTP_201_CREATED
+                        response_serializer.data,
+                        status=status.HTTP_201_CREATED
                     )
                 else:
-                    return Response(response_serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    return Response(
+                        response_serializer.data,
+                        status=status.HTTP_200_OK
+                    )
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class ProjectCriterionViewSet(viewsets.ModelViewSet):

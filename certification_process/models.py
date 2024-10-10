@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 
 
 class Section(models.Model):
@@ -61,12 +62,8 @@ class Project(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
 
-    def total_credits(self):
-        completed_criteria = self.project_criteria.filter(status='approval')
-        return sum(pc.criterion.credits for pc in completed_criteria)
-
-    def __str__(self):
-        return self.name
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
 
 
 class ProjectCriterion(models.Model):
@@ -87,13 +84,27 @@ class ProjectCriterion(models.Model):
         )
     status = models.CharField(
         max_length=25,
-        choices=Criterion.STATUS_CHOICES,
+        choices=STATUS_CHOICES,
         default="in_scope"
     )
     note = models.TextField(blank=True)
 
     class Meta:
         unique_together = ('project', 'criterion')
+
+    def clean(self):
+
+        if ProjectCriterion.objects.filter(
+            project=self.project, criterion=self.criterion
+                ).exclude(pk=self.pk).exists():
+            raise ValidationError(
+                f"Eine ProjectCriterion mit diesem Projekt"
+                f"und Kriterium {self.criterion} existiert bereits."
+                )
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.project.name} - {self.criterion.name}"

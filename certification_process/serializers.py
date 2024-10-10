@@ -58,13 +58,9 @@ class ProjectCriterionSerializer(serializers.ModelSerializer):
 
 class ProjectSerializer(serializers.ModelSerializer):
     project_criteria = ProjectCriterionSerializer(many=True, read_only=True)
-    total_credits = serializers.SerializerMethodField()
 
     class Meta:
         model = Project
         fields = [
-            'id', 'name', 'description', 'project_criteria', 'total_credits'
+            'id', 'name', 'description', 'project_criteria'
             ]
-
-    def get_total_credits(self, obj):
-        return obj.total_credits()
