@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
 environ.Env.read_env()
 
-env_file = os.path.join(BASE_DIR, '.env')
+env_file = os.path.join(BASE_DIR, ".env")
 environ.Env.read_env(env_file)
 
 # Quick-start development settings - unsuitable for production
@@ -111,6 +111,9 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
+    ],
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
     ]
 }
 
@@ -174,8 +177,3 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-if "DEV" not in os.environ:
-    REST_FRAMEWORK["DEFAULT_RENDERER_CLASS"] = [
-        "rest_framework.renderers.JSONRenderer"
-    ]
