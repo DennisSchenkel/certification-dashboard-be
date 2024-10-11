@@ -10,6 +10,7 @@ django-summernote==0.8.20.0
 djangorestframework==3.15.2
 drf-nested-routers==0.94.1
 environ==1.0
+gunicorn==23.0.0
 mypy-extensions==1.0.0
 packaging==24.1
 pathspec==0.12.1
