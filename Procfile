@@ -1,2 +1,2 @@
-web: gunicorn certification_process.wsgi --log-file -
+web: gunicorn cbre_certification_dashboard.wsgi --log-file -
 
